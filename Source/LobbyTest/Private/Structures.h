@@ -25,11 +25,15 @@ struct FPlayerInfo
 	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
 		bool bReady;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
+		class APlayerController* inPlctCtrl;
+
 	FPlayerInfo()
 	{
 		bHost = false;
 		bReady = false;
 		PlayerName = FText::FromString("");
+		inPlctCtrl = nullptr;
 	}
 };
 

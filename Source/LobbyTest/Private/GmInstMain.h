@@ -6,64 +6,14 @@
 // Base class
 #include "Engine/GameInstance.h"
 
+// Libraries
+#include "Structures.h"
+
 // Interfaces
 #include "Interfaces/OnlineSessionInterface.h"
 
 // Generated
 #include "GmInstMain.generated.h"
-
-USTRUCT(BlueprintType)
-struct FPlayerInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-		FText PlayerName;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-		bool bHost;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Player Info")
-		bool bReady;
-
-	FPlayerInfo()
-	{
-		bHost = false;
-		bReady = false;
-		PlayerName = FText::FromString("");
-	}
-};
-
-
-USTRUCT(BlueprintType)
-struct FServerInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, Category = "Server Info")
-		bool bUsePass;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Server Info")
-		FString ServerMap;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Server Info")
-		FText ServerName;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Server Info")
-		FText ServerPassword;
-
-	UPROPERTY(BlueprintReadWrite, Category = "Server Info")
-		int32 MaxPlayers;
-
-	FServerInfo()
-	{
-		bUsePass = false;
-		ServerName = FText::FromString("");
-		ServerPassword = FText::FromString("");
-		ServerMap = "MapPrototype";
-		MaxPlayers = 4;
-	}
-};
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FServerListUpdated, const TArray<FServerInfo>&, inServers);
 
@@ -81,10 +31,10 @@ public:
 		virtual void CreateServer(const FServerInfo& inServerInfo, const FText& inPlayerName);
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		virtual void SearchServer();
+		virtual void JoinServer(const FText& inServerName, const FText& inPlayerName);
 
 	UFUNCTION(BlueprintCallable, Category = "Events")
-		virtual void JoinServer(const FText& inServerName);
+		virtual void SearchServer();
 
 	// Delegates
 	UPROPERTY(BlueprintAssignable, Category = "Server")
@@ -105,16 +55,16 @@ protected:
 
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Levels")
+	UPROPERTY(BlueprintReadWrite, Category = "Names")
 		FName ServerName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Levels")
 		FString MapLobbyString;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Servers")
-		TArray<FServerInfo> Servers;
+	UPROPERTY(BlueprintReadWrite, Category = "Player")
+		FText PlayerName;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Servers")
-		TArray<FPlayerInfo> Players;
+		TArray<FServerInfo> Servers;
 
 };

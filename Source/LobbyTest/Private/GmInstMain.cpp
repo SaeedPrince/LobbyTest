@@ -45,12 +45,12 @@ void UGmInstMain::OnCreateSessionComplete(FName inServerName, bool Success)
 
 void UGmInstMain::OnFindSessionComplete(bool Success)
 {
-	Servers.Empty();
 	if (Success)
 	{
 		TArray<FOnlineSessionSearchResult> SearchResults = SessionSearch->SearchResults;
 		if (SearchResults.Num() > 0)
 		{
+			Servers.Empty();
 			for (FOnlineSessionSearchResult Result : SearchResults)
 			{
 				if (Result.IsValid())
@@ -80,32 +80,15 @@ void UGmInstMain::OnJoinSessionComplete(FName SessionName, EOnJoinSessionComplet
 		if (JoinAddress != "")
 		{
 			PController->ClientTravel(JoinAddress, ETravelType::TRAVEL_Absolute);
-			/*
-			FPlayerInfo plInfo = FPlayerInfo();
-			APlayerState* plState = PController->PlayerState;
-			if (IsValid(plState))
-			{
-				plInfo.PlayerName = FText::FromString(plState->GetPlayerName());
-				Players.Add(plInfo);
-			}
-			*/
 		}
-		/*
-		FOnlineSessionSettings* onlSess = SessionInterface->GetSessionSettings(SessionName);
-		FString PlayerName;
-		if (onlSess->Get(FName("PlayerName"), PlayerName))
-		{
-			PrintOnLog("PlayerName=", PlayerName);
-		}
-		*/
 	}
 }
 
 void UGmInstMain::CreateServer(const FServerInfo& inServerInfo, const FText& inPlayerName)
 {
-	Players.Empty();
 	if (SessionInterface.IsValid())
 	{
+		PlayerName = inPlayerName;
 		FString srvString = inServerInfo.ServerName.ToString();
 		FName srvName = UKismetStringLibrary::Conv_StringToName(srvString);
 		FOnlineSessionSettings SessionSettings;
@@ -117,13 +100,6 @@ void UGmInstMain::CreateServer(const FServerInfo& inServerInfo, const FText& inP
 		SessionSettings.NumPublicConnections = 9;
 		SessionSettings.Set<FString>(ServerName, srvString, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		SessionInterface->CreateSession(0, srvName, SessionSettings);
-		/*
-		FPlayerInfo plInfo = FPlayerInfo();
-		plInfo.PlayerName = inPlayerName;
-		plInfo.bHost = true;
-		plInfo.bReady = true;
-		Players.Add(plInfo);
-		*/
 	}
 	else
 	{
@@ -140,7 +116,7 @@ void UGmInstMain::SearchServer()
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 }
 
-void UGmInstMain::JoinServer(const FText& inServerName)
+void UGmInstMain::JoinServer(const FText& inServerName, const FText& inPlayerName)
 {
 	TArray<FOnlineSessionSearchResult> SearchResults = SessionSearch->SearchResults;
 	for (int32 i = 0; i < Servers.Num(); i++)
@@ -148,7 +124,7 @@ void UGmInstMain::JoinServer(const FText& inServerName)
 		FText srvName = Servers[i].ServerName;
 		if (srvName.EqualTo(inServerName))
 		{
-			//SearchResults[i].Session.SessionSettings.Set<FString>(FName("PlayerName"), "AAA", EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+			PlayerName = inPlayerName;
 			SessionInterface->JoinSession(0, UKismetStringLibrary::Conv_StringToName(inServerName.ToString()), SearchResults[i]);
 			break;
 		}
